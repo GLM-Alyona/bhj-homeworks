@@ -1,37 +1,64 @@
-const sliders = document.querySelectorAll('.slider__item'),
-    prev = document.querySelector('.slider__arrow_prev'),
-    next = document.querySelector('.slider__arrow_next'),
-    dots = document.querySelectorAll('.slider__dot');
-let slideActive = 0;
+'use strict';
 
-prev.onclick = () => {
-    if (slideActive - 1 < 0) {
-        slideActive = sliders.length - 1;
-    } else {
-        slideActive -= 1;
+class SliderComponent {
+    // Инициализируем все обработчики событий для указанного селектора + запоминаем внутреннее состояние слайдера
+    constructor(selector) {
+        let self = this;
+
+        self.slider = document.querySelector(selector);
+        self.sliderItems = [...self.slider.querySelectorAll('.slider__item')];
+        self.dots = [...self.slider.querySelectorAll('.slider__dots .slider__dot')];
+
+        self.slider.querySelector('.slider__arrows .slider__arrow_prev').addEventListener('click', (e) => {
+            self.onClickPreviousSlide();
+        });
+        self.slider.querySelector('.slider__arrows .slider__arrow_next').addEventListener('click', (e) => {
+            self.onClickNextSlide();
+        });
+
+        self.activeSlideClass = 'slider__item_active';
+        self.activeDotClass = 'slider__dot_active';
+        self.activeSlide = self.sliderItems.findIndex((slide) =>
+            slide.classList.contains(self.activeSlideClass),
+        );
+
+        self.dots[self.activeSlide].classList.add(self.activeDotClass);
+        self.dots.forEach((dot) => {
+            dot.addEventListener('click', (e) => {
+                self.onClickDot(e);
+            });
+        });
     }
-    changeSlide(slideActive);
-}
 
-next.onclick = () => {
-    if (slideActive + 1 === sliders.length) {
-        slideActive = 0;
-    } else {
-        slideActive += 1;
+    // Перелистывание вперед
+    onClickNextSlide() {
+        this.activeSlide = this.activeSlide < this.sliderItems.length - 1 ? this.activeSlide + 1 : 0;
+        this.updateSliderState();
+    };
+
+    // Перелистывание назад
+    onClickPreviousSlide() {
+        this.activeSlide = this.activeSlide === 0 ? this.sliderItems.length - 1 : this.activeSlide - 1;
+        this.updateSliderState();
+    };
+
+    // Обновляем текущую картинку и текущую "точку" внизу слайдера
+    updateSliderState() {
+        this.dots.forEach((dot) => dot.classList.remove(this.activeDotClass));
+        this.dots[this.activeSlide].classList.add(this.activeDotClass);
+        this.sliderItems.forEach((slide) => slide.classList.remove(this.activeSlideClass));
+        this.sliderItems[this.activeSlide].classList.add(this.activeSlideClass);
     }
-    changeSlide(slideActive);
+
+    // Обработчик клика "точки" внизу слайдера
+    onClickDot(e) {
+        this.activeSlide = this.dots.findIndex((dot) => dot === e.target);
+        this.updateSliderState();
+    };
 }
 
-// Управление точками
-dots[slideActive].classList.add('slider__dot_active');
-[...dots].forEach((item, i) => item.onclick = () => {
-    changeSlide(i);
-});
+// только когда вся страница загрузилась добавляем обработчики событий
+window.onload = function ready(handler) {
+    new SliderComponent('.slider');
 
-// Функция переключения слайда на номер i
-function changeSlide(i) {
-    [...sliders].forEach((item) => item.classList.remove('slider__item_active'));
-    [...dots].forEach((item) => item.classList.remove('slider__dot_active'));
-    sliders[i].classList.add('slider__item_active');
-    dots[i].classList.add('slider__dot_active');
-}
+};
