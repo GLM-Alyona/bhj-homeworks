@@ -68,6 +68,11 @@ class Autocomplete {
   }
 
   getMatches( text ) {
+    
+    return [...this.input.options].filter((option) => {
+      return option.text.toUpperCase().includes(text.toUpperCase());
+  });
+
     /*
       TODO: этот метод нужно дописать
       text - фраза, которую вводят в поле поиска
