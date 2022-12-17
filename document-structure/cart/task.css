@@ -82,6 +82,14 @@ body {
   cursor: pointer;
 }
 
+button {
+  background-color: #fff !important;
+}
+
+button:hover {
+  background-color: #fff;
+} 
+
 .product__add:hover {
   opacity: 0.8;
 }
