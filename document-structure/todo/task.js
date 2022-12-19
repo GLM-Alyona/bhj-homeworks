@@ -1,53 +1,28 @@
-class TodoComponent {
-    constructor(selector) {
-        let self = this;
-        self.tasksInput = document.querySelector(selector + ' .tasks__input');
-        self.tasksList = document.querySelector(selector + ' .tasks__list');
-        self.tasksAddButton = document.querySelector(selector + ' .tasks__add');
+const taskInput = document.getElementById('task__input');
+const taskButton = document.getElementById('tasks__add');
+const tasksListContainer = document.getElementById('tasks__list');
 
-        self.tasksInput.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                self.addTask(event);
-            }
-        });
+function addTask() {
+    tasksListContainer.insertAdjacentHTML('beforeEnd', `
+ <div class="task">
+ <div class="task__title">
+            ${taskInput.value}
+ </div>
+ <a href="#" class="task__remove">&times;</a>
+ </div>
+    `);
+    
+    taskInput.value = '';
 
-        self.tasksAddButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            self.addTask(event);
-        });
-    }
-
-    addTask(event) {
-        if (this.tasksInput.value.trim().length !== 0) {
-            this.tasksList.appendChild(this.generateTaskHTML(this.tasksInput.value));
-            this.tasksInput.value = '';
-        }
-    }
-
-    generateTaskHTML(text) {
-        const taskTitle = document.createElement('div');
-        taskTitle.classList.add('task__title');
-        taskTitle.innerText = text;
-
-        const taskRemoveLink = document.createElement('a');
-        taskRemoveLink.href = '#';
-        taskRemoveLink.classList.add('task__remove');
-        taskRemoveLink.innerHTML = '&times;';
-        taskRemoveLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.target.closest('.task').remove();
-        });
-
-        const task = document.createElement('div');
-        task.classList.add('task');
-        task.appendChild(taskTitle)
-        task.appendChild(taskRemoveLink);
-        return task;
-    }
+    const taskRemove = tasksListContainer.lastElementChild.querySelector('.task__remove');
+    taskRemove.onclick = () => taskRemove.closest('.task').remove();
 }
 
-// только когда вся страница загрузилась добавляем обработчики событий
-window.onload = function ready(handler) {
-    new TodoComponent('.tasks');
-};
+document.getElementById('tasks__form').onclick = (event) => event.preventDefault();
+
+// Добавляет задачу при нажатии кнопки "Добавить" и нажатии Enter
+taskButton.addEventListener('click', () => {
+    if (taskInput.value.trim().length !== 0) {
+        addTask();
+    }
+});
